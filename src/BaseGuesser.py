@@ -22,7 +22,6 @@ class BaseGuesser:
         :param speed: The speed with which the sequence was read
         :return: A Pandas DataFrame with the section numbers as index and color and confidence as output
         """
-        # TODO: Test this works
         # Get the confidence data and remove Time from the index
         data = cls.guess(data, speed).reset_index(1)
         return data.sort_values("Confidence", ascending=False).groupby("Section").head(1).sort_values("Section")
