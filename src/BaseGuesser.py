@@ -58,6 +58,7 @@ class BaseGuesser:
 
         # Ignore a warning from Pandas
         import warnings
+        import pandas.core.common
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", pd.core.common.SettingWithCopyWarning)
 
