@@ -85,12 +85,12 @@ if __name__ == "__main__":
     pd.set_option("display.max_columns", None)
     pd.set_option("display.max_rows", None)
 
-    column = "Colour_p4_01"
-    file = "../trainingData/WWWWyrgbyyrrggbbyyyrrrgggbbbyyyyrrrrggggbbbbWWWW_speed5.csv"
+    column = "Colour_p4_03"
+    file = "../trainingData/WWWWbbbbbbbbbbWWWW_speed5.csv"
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
     # print(BaseCaller.dropBeforeSequence(df))
 
-    time = TimeCalculator().calc_time(df["Colour_p4_01"].to_numpy())
+    time = TimeCalculator().calc_time(df[column].to_numpy())
 
     print(time)
 
