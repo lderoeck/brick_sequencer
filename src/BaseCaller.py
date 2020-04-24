@@ -21,9 +21,8 @@ def dropBeforeSequence(df):
         if rowData[1] == 6:
             if whiteCounter == 0:
                 cutIndex = index
-                temp = rowData[0]
             whiteCounter += 1
-            if whiteCounter == 10:
+            if whiteCounter == whiteThreshold:
                 return df.iloc[cutIndex: , :]
         else:
             whiteCounter = 0
@@ -34,4 +33,5 @@ if __name__ == "__main__":
     column = "Colour_p4_01"
     file = "../trainingData/WWWWyrgbyyrrggbbyyyrrrgggbbbyyyyrrrrggggbbbbWWWW_speed5.csv"
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
-    print(dropBeforeSequence(df))
+    df = dropBeforeSequence(df)
+
