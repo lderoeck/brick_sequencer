@@ -16,7 +16,7 @@ class TimeCalculator:
         :return:
         """
         data = self.white(sequence)
-        return sum(data) / num_white * time_step
+        return np.floor(np.sum(data) / num_white) * time_step
 
     def read_csv(self, input_file: str):
         df = pd.read_csv(input_file, sep=",")
