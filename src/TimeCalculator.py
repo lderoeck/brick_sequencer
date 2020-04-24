@@ -5,33 +5,26 @@ import re
 
 class TimeCalculator:
     def __init__(self):
-        pass
+        self.white = np.vectorize(lambda x: x == "6.000" or x == 6)
+
+    def calc_time(self, sequence, num_white=8, time_step=0.01):
+        """
+        Calculates time needed to read a single base
+        :param sequence: array (row) of sequence data
+        :param num_white: amount of white bases present in sequence (start/end)
+        :param time_step: amount of time passed each step (default 10ms)
+        :return:
+        """
+        data = self.white(sequence)
+        return sum(data) / num_white * time_step
 
     def read_csv(self, input_file: str):
         df = pd.read_csv(input_file, sep=",")
 
         arrays = df.transpose().to_numpy()
 
-        vf = np.vectorize(lambda x: x == "6.000" or x == 6)
-
-        for i in range(len(arrays)-1):
-            array = arrays[i]
-            simpl = vf(array)
-            # print(simpl)
-            print(sum(simpl)/8)
-
-        # print(arrays)
-
-        # for i in range(len(arrays)-1):
-        #     array = arrays[i]
-        #     for j in range(len(array)-1):
-
-        # keys = df.keys()
-        # for i in range(1, len(keys)):
-        #     key = keys[i]
-        #     print(df.get(key).apply(lambda x: float(str(x)) if re.match(r"\d", str(x)) else 0))
-
-        # print(df.apply(lambda x: float(x) if re.match(r"\d", x) else 0))
+        for i in range(len(arrays) - 1):
+            print(self.calc_time(arrays[i]))
 
 
 if __name__ == "__main__":
