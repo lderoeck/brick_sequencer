@@ -80,6 +80,7 @@ class BaseGuesser:
 
 if __name__ == "__main__":
     import BaseCaller
+    from src.TimeCalculator import *
 
     pd.set_option("display.max_columns", None)
     pd.set_option("display.max_rows", None)
@@ -89,6 +90,10 @@ if __name__ == "__main__":
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
     # print(BaseCaller.dropBeforeSequence(df))
 
-    print(BaseGuesser.sequence(BaseCaller.dropBeforeSequence(df), 0.8))
+    time = TimeCalculator().calc_time(df["Colour_p4_01"].to_numpy())
+
+    print(time)
+
+    print(BaseGuesser.sequence(BaseCaller.dropBeforeSequence(df), time))
 
     exit(0)
