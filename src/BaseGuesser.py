@@ -88,12 +88,11 @@ if __name__ == "__main__":
     column = "Colour_p4_03"
     file = "../trainingData/WWWWbbbbbbbbbbWWWW_speed5.csv"
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
-    # print(BaseCaller.dropBeforeSequence(df))
 
     time = TimeCalculator().calc_time(df[column].to_numpy())
 
     print(time)
 
-    print(BaseGuesser.sequence(BaseCaller.dropBeforeSequence(df), time))
+    print(BaseGuesser.sequence(BaseCaller.dropNonSequence(df), time))
 
     exit(0)
