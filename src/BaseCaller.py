@@ -29,9 +29,30 @@ def dropBeforeSequence(df):
         index += 1
 
 
+def dropAfterSequence(df):
+    index = len(df.index)
+    whiteCounter = 0
+    cutIndex = 0
+    while index >= df.idxmin()[0]:
+        rowData = df.loc[index, :]
+        if rowData[1] == 6:
+            if whiteCounter == 0:
+                cutIndex = index+1
+            whiteCounter += 1
+            if whiteCounter == whiteThreshold:
+                return df.iloc[:cutIndex-df.idxmin()[0], :]
+        else:
+            whiteCounter = 0
+        index -= 1
+        
+def dropNonSequence(df):
+    df = dropBeforeSequence(df)
+    df = dropAfterSequence(df)
+    return df
+
 if __name__ == "__main__":
     column = "Colour_p4_01"
     file = "../trainingData/WWWWyrgbyyrrggbbyyyrrrgggbbbyyyyrrrrggggbbbbWWWW_speed5.csv"
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
-    df = dropBeforeSequence(df)
-
+    df = dropNonSequence(df)
+    print(df)
