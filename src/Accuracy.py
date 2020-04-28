@@ -6,8 +6,8 @@ from os import walk
 
 def getFiles(dir):
     """"
-    gets all the files from a directory to guess the bases for
-
+        gets all the files from a directory to guess the bases for
+        :dir: directory of test files
     """
     files = []
     for (dirpath, dirnames, filenames) in walk(dir):
@@ -17,6 +17,11 @@ def getFiles(dir):
     return files
 
 def getAccuracy(dir, files):
+    """"
+        gets the total accuracy of all the files in the given directory
+        :dir: directory of test files
+        :files: files to test
+    """
     totalRuns = 0
     totalScore = 0
     for file in files:
@@ -42,7 +47,7 @@ def getAccuracy(dir, files):
 
             time = TimeCalculator().calc_time(df[column].to_numpy())
 
-            print(time)
+            #print(time)
 
             dfRes = BaseGuesser.sequence(src.BaseCaller.dropNonSequence(df), time)
             accuracy = calculateAcurracyRun(sequence, dfRes)
@@ -50,10 +55,15 @@ def getAccuracy(dir, files):
             print(dfRes)
             totalScore += accuracy
             columnNumber += 1
-    print  (totalScore/totalRuns)
+    print(totalScore/totalRuns)
     return totalScore/totalRuns
 
 def calculateAcurracyRun(expected, dfRes):
+    """"
+        Calculates the accuracy of 1 rune
+        :excepted: expected sequence in the form of a list
+        :dfRes: guessed sequence in a pandas dataframe
+    """
     right = 0
     total = 0
     index = 0
@@ -73,6 +83,7 @@ def calculateAcurracyRun(expected, dfRes):
 
 def isSameColor(exp, res):
     """"
+        :return: boolean True if the expected and the guessed color are the same, otherwise false
         # Color Codes:
         # 1 	black
         # 2 	blue
