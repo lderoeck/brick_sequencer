@@ -27,7 +27,7 @@ def dropBeforeSequence(df):
         else:
             whiteCounter = 0
         index += 1
-
+    return df
 
 def dropAfterSequence(df):
     index = len(df.index)
@@ -44,7 +44,8 @@ def dropAfterSequence(df):
         else:
             whiteCounter = 0
         index -= 1
-        
+    return df
+
 def dropNonSequence(df):
     df = dropBeforeSequence(df)
     df = dropAfterSequence(df)
