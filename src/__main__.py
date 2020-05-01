@@ -9,34 +9,20 @@ from .BaseCaller import dropNonSequence
 from .BaseGuesser import BaseGuesser
 from .TimeCalculator import TimeCalculator
 import src.colour as colour
+from .file import File
 
 
-def main(args):
+def main():
+    import sys
+
     parser = argparse.ArgumentParser(description="A base caller for the Lego brick sequencer")
     parser.add_argument("file", type=str, help="The file to process")
     parser.add_argument("-i", "--image-file", type=str, required=False, default=None,
                         help="Location of the image file to generate", metavar="IMAGE")
 
-    args = parser.parse_args(args)
+    args = parser.parse_args(sys.argv[1:])
 
-
-    # Check file exists
-    if not os.path.exists(args.file):
-        raise ValueError("Filename does not exist")
-
-    # Get the file header
-    with open(args.file, encoding="utf-8-sig") as f:
-        header: List[str] = next(csv.reader(f))
-
-    # Check the Time column
-    if "Time" not in header:
-        raise ValueError("Time column missing from data file")
-
-    # Filter the Time column
-    header.remove("Time")
-
-    # Repeat for each column in the file
-    for column in header:
+    def processing(filename: str, column: str):
         df = pd.read_csv(args.file, index_col=False, usecols=["Time", column], na_values="-")
         df = df.dropna()  # Drop NaN values
 
@@ -55,7 +41,8 @@ def main(args):
 
         print(f"Sequence in column {column}:", "".join(sequence))
 
+    File.process(args.file, processing)
+
 
 if __name__ == "__main__":
-    import sys
-    main(sys.argv)
+    main()
