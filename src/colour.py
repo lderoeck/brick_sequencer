@@ -18,38 +18,38 @@ class Colour(Enum):
 
 
 colour_name = {
-    Colour.NONE: "none",
-    Colour.BLACK: "black",
-    Colour.BLUE: "blue",
-    Colour.GREEN: "green",
-    Colour.YELLOW: "yellow",
-    Colour.RED: "red",
-    Colour.WHITE: "white",
-    Colour.BROWN: "brown"
+    Colour.NONE.value: "none",
+    Colour.BLACK.value: "black",
+    Colour.BLUE.value: "blue",
+    Colour.GREEN.value: "green",
+    Colour.YELLOW.value: "yellow",
+    Colour.RED.value: "red",
+    Colour.WHITE.value: "white",
+    Colour.BROWN.value: "brown"
 }
 
 # Short colour codes
 colour_short = {
-    Colour.NONE: "-",
-    Colour.BLACK: "-",
-    Colour.BLUE: "b",
-    Colour.GREEN: "g",
-    Colour.YELLOW: "y",
-    Colour.RED: "r",
-    Colour.WHITE: "w",
-    Colour.BROWN: "-"
+    Colour.NONE.value: "-",
+    Colour.BLACK.value: "-",
+    Colour.BLUE.value: "b",
+    Colour.GREEN.value: "g",
+    Colour.YELLOW.value: "y",
+    Colour.RED.value: "r",
+    Colour.WHITE.value: "w",
+    Colour.BROWN.value: "-"
 }
 
 # Translate sequence data to RGB
 colour_rgb = {
-    Colour.NONE: (0, 0, 0),
-    Colour.BLACK: (0, 0, 0),
-    Colour.BLUE: (0, 0, 255),
-    Colour.GREEN: (0, 255, 0),
-    Colour.YELLOW: (255, 255, 0),
-    Colour.RED: (255, 0, 0),
-    Colour.WHITE: (255, 255, 255),
-    Colour.BROWN: (120, 60, 60),
+    Colour.NONE.value: (0, 0, 0),
+    Colour.BLACK.value: (0, 0, 0),
+    Colour.BLUE.value: (0, 0, 255),
+    Colour.GREEN.value: (0, 255, 0),
+    Colour.YELLOW.value: (255, 255, 0),
+    Colour.RED.value: (255, 0, 0),
+    Colour.WHITE.value: (255, 255, 255),
+    Colour.BROWN.value: (120, 60, 60),
 }
 
 
