@@ -27,6 +27,18 @@ colours_short = {
     7.0: "-"
 }
 
+# Translate sequence data to RGB
+colours_rgb = {
+    0.0: (0, 0, 0),
+    1.0: (0, 0, 0),
+    2.0: (0, 0, 255),
+    3.0: (0, 255, 0),
+    4.0: (255, 255, 0),
+    5.0: (255, 0, 0),
+    6.0: (255, 255, 255),
+    7.0: (120, 60, 60),
+}
+
 
 def translate(sequence: pd.DataFrame, translation: Dict[float, str] = colours_short) -> List[str]:
     return sequence.replace({"Colour": translation})["Colour"].tolist()
