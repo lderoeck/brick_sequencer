@@ -8,7 +8,7 @@ import pandas as pd
 from .BaseCaller import dropNonSequence
 from .BaseGuesser import BaseGuesser
 from .TimeCalculator import TimeCalculator
-import brick_sequencer.colours as colours
+import brick_sequencer.colour as colour
 
 
 def main():
@@ -53,7 +53,7 @@ def main():
 
         # Sequence the column and translate the results
         sequence = BaseGuesser.sequence(df, speed)
-        sequence = colours.translate(sequence)
+        sequence = colour.translate(sequence)
 
         print(f"Sequence in column {column}:", "".join(sequence))
 
