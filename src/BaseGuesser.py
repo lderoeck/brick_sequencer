@@ -1,5 +1,11 @@
 import math
+from typing import *
 import pandas as pd
+
+
+def mean_square_error(confidence: pd.Series) -> float:
+    """Calculates the MSE for a series of confidences"""
+    return math.sqrt(((1 - confidence) ** 2).sum())
 
 
 class BaseGuesser:
@@ -7,7 +13,10 @@ class BaseGuesser:
         pass
 
     @classmethod
-    def sequence(cls, data: pd.DataFrame, speed: float) -> pd.DataFrame:
+    def sequence(cls, data: pd.DataFrame,
+                 speed: float,
+                 max_offset: int = 10,
+                 confidence_error: Callable[[pd.Series], float] = mean_square_error) -> pd.DataFrame:
         """
         Return a guessed sequence of bases (or colors in our case)
 
@@ -20,11 +29,29 @@ class BaseGuesser:
 
         :param data: The (cleaned) data to determine the sequence off
         :param speed: The speed with which the sequence was read
+        :param max_offset: The maximum amount of steps to offset the data to achieve better results
+        :param confidence_error: Function to use when calculating the total confidence
         :return: A Pandas DataFrame with the section numbers as index and color and confidence as output
         """
-        # Get the confidence data and remove Time from the index
-        data = cls.guess(data, speed).reset_index(1)
-        return data.sort_values("Confidence", ascending=False).groupby("Section").head(1).sort_values("Section")
+        tries = dict()
+
+        for offset in range(max_offset + 1):
+            local_data = data.copy()
+            local_data = local_data.iloc[offset:]
+
+            # Guess the colours and confidences
+            local_data = cls.guess(local_data, speed).reset_index(1)
+            # Sort the colours by confidence in each section
+            local_data = local_data.sort_values("Confidence", ascending=False).groupby("Section")
+            # Get the most confident colour for each section and sort by section
+            local_data = local_data.head(1).sort_values("Section")
+
+            # Calculate the total confidence
+            confidence = 1 - confidence_error(local_data["Confidence"])
+            tries[offset] = (confidence, local_data)
+
+        # Return the DataFrame for which we got the highest confidence
+        return max(tries.items(), key=lambda x: x[1][0])[1][1]
 
     @classmethod
     def guess(cls, data: pd.DataFrame, speed: float) -> pd.DataFrame:
