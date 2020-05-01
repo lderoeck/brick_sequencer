@@ -8,16 +8,18 @@ import pandas as pd
 from .BaseCaller import dropNonSequence
 from .BaseGuesser import BaseGuesser
 from .TimeCalculator import TimeCalculator
-import src.colours as colours
+import brick_sequencer.colours as colours
 
 
-def main(args):
+def main():
+    import sys
+
     parser = argparse.ArgumentParser(description="A base caller for the Lego brick sequencer")
     parser.add_argument("file", type=str, help="The file to process")
     parser.add_argument("-i", "--image-file", type=str, required=False, default=None,
                         help="Location of the image file to generate", metavar="IMAGE")
 
-    args = parser.parse_args(args)
+    args = parser.parse_args(sys.argv)
 
 
     # Check file exists
@@ -57,5 +59,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    import sys
-    main(sys.argv)
+    main()

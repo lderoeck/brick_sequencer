@@ -107,7 +107,7 @@ class BaseGuesser:
 
 if __name__ == "__main__":
     import BaseCaller
-    from src.TimeCalculator import *
+    from brick_sequencer.TimeCalculator import *
 
     pd.set_option("display.max_columns", None)
     pd.set_option("display.max_rows", None)

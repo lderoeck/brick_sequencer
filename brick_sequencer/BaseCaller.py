@@ -1,4 +1,4 @@
-from src.TimeCalculator import *
+from brick_sequencer.TimeCalculator import *
 
 whiteThreshold = 10  # threshold to recognize the starting white block(s)
 
