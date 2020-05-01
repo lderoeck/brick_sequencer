@@ -1,7 +1,7 @@
 import pandas as pd
 from PIL import Image
 
-from .colours import colours_rgb
+from .colour import colour_rgb
 
 
 def export(series: pd.Series, filename: str) -> bool:
@@ -11,7 +11,7 @@ def export(series: pd.Series, filename: str) -> bool:
     for _ in range(16):
         image_data.extend(series.tolist())
 
-    image_data = [x for x in map(lambda y: colours_rgb[y], image_data)]
+    image_data = [x for x in map(lambda y: colour_rgb[y], image_data)]
 
     image.putdata(image_data)
 
@@ -32,7 +32,7 @@ def export_2(series, filename):
         for i in range(len(series)):
             big_sequ.append(series[i][j])
 
-    image_data = [x for x in map(lambda y: colours_rgb[y], big_sequ)]
+    image_data = [x for x in map(lambda y: colour_rgb[y], big_sequ)]
 
     image.putdata(image_data)
 
