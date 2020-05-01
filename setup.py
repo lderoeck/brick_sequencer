@@ -7,7 +7,8 @@ setup(
 
     entry_points={
         "console_scripts": [
-            "brick_sequencer = brick_sequencer.__main__:main"
+            "brick_sequencer = brick_sequencer.__main__:main",
+            "brick-convert = brick_sequencer.image:main",
         ]
     },
 )
