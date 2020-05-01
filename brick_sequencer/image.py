@@ -4,11 +4,11 @@ from PIL import Image
 from .colour import colour_rgb
 
 
-def export(series: pd.Series, filename: str) -> bool:
-    image = Image.new("RGB", (series.size, 16))
+def export(series: pd.Series, filename: str, height: int = 16) -> bool:
+    image = Image.new("RGB", (series.size, height))
 
     image_data = []
-    for _ in range(16):
+    for _ in range(height):
         image_data.extend(series.tolist())
 
     image_data = [x for x in map(lambda y: colour_rgb[y], image_data)]
@@ -39,3 +39,29 @@ def export_2(series, filename):
     image.save(filename)
 
     return True
+
+
+def main():
+    import sys
+    import argparse
+
+    from .file import File
+
+    parser = argparse.ArgumentParser(description="Convert a sequence CSV to an image")
+    parser.add_argument("file", type=str, help="The file to convert")
+    parser.add_argument("image", type=str, help="The base filename of the output image")
+    parser.add_argument("--height", default=16, type=int, required=False, help="The image height")
+
+    args = parser.parse_args(sys.argv[1:])
+
+    def processing(filename: str, column: str):
+        df = pd.read_csv(filename, index_col=False, usecols=["Time", column], na_values="-")
+        df = df.fillna(0)
+
+        export(df[column], f"{args.image}_{column}.png", height=args.height)
+
+    File.process(args.file, processing)
+
+
+if __name__ == "__main__":
+    main()
