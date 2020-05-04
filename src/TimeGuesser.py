@@ -8,11 +8,12 @@ class TimeGuesser:
     def __init__(self):
         pass
 
-    def split_sequence(self, array: list):
-        white = np.vectorize(lambda x: x == "6.000" or x == 6)
-        return self.clean_data(white(array))
-
     def _sanitise(self, symbol):
+        """
+        Cleans data to correct colour values
+        :param symbol: Input symbol
+        :return: Correct colour value
+        """
         if re.match("7", str(symbol)):
             return "Brown"
         if re.match("6", str(symbol)):
@@ -31,11 +32,10 @@ class TimeGuesser:
 
     def clean_data(self, array: list):
         """
-        Creates most likely DNA string
-        :param array:
-        :return:
+        Clean data to only contain colours
+        :param array: Raw input stream of reader
+        :return: List of cleaned data with lengths
         """
-        # Clean data to only contain colours
         full_sequence = []
         current = self._sanitise(array[0])
         length = 0
@@ -51,10 +51,19 @@ class TimeGuesser:
 
         full_sequence.append({"symbol": current, "length": length})
 
-        # Filter out best guess for dna sequence
+        return full_sequence
+
+    def split_sequence(self, array: list):
+        """
+        Remove input before and after sequence
+        :param array: Raw input stream of reader
+        :return: List of cleaned sequence data with lengths
+        """
         sequence = []
         potential = []
         in_sequence = False
+
+        full_sequence = self.clean_data(array)
 
         for data in full_sequence:
             if not in_sequence:
@@ -69,6 +78,8 @@ class TimeGuesser:
                 sequence += potential
                 potential = []
                 continue
+
+        return sequence
 
         # Filter out most likely wrong input
         # value = np.vectorize(lambda x: x["length"])
@@ -87,8 +98,6 @@ class TimeGuesser:
         #
         #     cleaned[-1]["length"] += amount
 
-        return sequence
-
 
 if __name__ == "__main__":
     guesser = TimeGuesser()
@@ -96,4 +105,4 @@ if __name__ == "__main__":
     column = "Colour_p4_01"
     file = "../trainingData/WWWWggggggggggggWWWW_speed5.csv"
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
-    print(guesser.clean_data(df[column].to_numpy()))
+    print(guesser.split_sequence(df[column].to_numpy()))
