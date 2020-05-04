@@ -4,6 +4,16 @@ import numpy as np
 import pandas as pd
 
 
+def theoretical_speed(speed: float):
+    """
+    Extrapolated speed function from data provided, won't give accurate read results but can be used as a starting point
+    for determining a more accurate speed.
+    :param speed: Speed setting used in the reader
+    :return: Rough estimation for amount of blocks/base, needs to be fine-tuned for the actual data input
+    """
+    return 250 / speed
+
+
 class TimeGuesser:
     def __init__(self):
         pass
@@ -103,6 +113,6 @@ if __name__ == "__main__":
     guesser = TimeGuesser()
 
     column = "Colour_p4_01"
-    file = "../trainingData/WWWWggggggggggggWWWW_speed5.csv"
+    file = "../trainingData/WWWWyggbgrbrbygyrbrrWWWW_speed30.csv"
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
     print(guesser.split_sequence(df[column].to_numpy()))
