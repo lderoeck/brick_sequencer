@@ -214,7 +214,7 @@ def convertColor(res):
 
 
 if __name__ == "__main__":
-    writeToFile = open("../accuracyResults/Result2.txt", "w")
+    writeToFile = open("../accuracyResults/Result3.txt", "w")
     dir = "../trainingData/"
     getAccuracy(dir, getFiles(dir))
     writeToFile.close()
