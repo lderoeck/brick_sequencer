@@ -14,13 +14,15 @@ def getFiles(dir):
         files.extend(filenames)
         break
     files.remove('README.txt')  # README is not a file to evaluate
+    #files.remove('Experiment10X_WWWWWWWWBBGGBBBYBYGYRRRBGGYGRGGWWWWWWWW.csv' )
     return files
 
 def getAccuracy(dir, files):
-    """"
-        gets the total accuracy of all the files in the given directory
-        :dir: directory of test files
-        :files: files to test
+    """
+
+    :param dir: directory to find training files
+    :param files: training files
+    :return: average accuracy of all training files
     """
     totalRuns = 0
     totalScore = 0
@@ -37,7 +39,8 @@ def getAccuracy(dir, files):
         while columnNumber < len(cols):
             totalRuns += 1
             column = cols[columnNumber]
-            print(sequence)
+            writeToFile.write("Correct Sequence: " + str(sequence.upper())+"\n")
+
             df = pd.read_csv(file, index_col=False, usecols=["Time", column])
             df = df.replace('-', 0.0)
             if df["Time"].dtypes != float:
@@ -47,52 +50,154 @@ def getAccuracy(dir, files):
 
             time = TimeCalculator().calc_time(df[column].to_numpy())
 
-            #print(time)
-
             dfRes = BaseGuesser.sequence(src.BaseCaller.dropNonSequence(df), time)
+            writeToFile.write("Guessed sequence: ")
+            for i,j in dfRes.iterrows():
+                writeToFile.write(convertColor(j[0]))
+            writeToFile.write("\n")
+            writeToFile.write("Column: " + column + "\n")
+
             accuracy = calculateAcurracyRun(sequence, dfRes)
-            print(accuracy)
-            print(dfRes)
+            writeToFile.write("Accuracy: "+str(accuracy)+"\n\n")
+
             totalScore += accuracy
             columnNumber += 1
-    print(totalScore/totalRuns)
+
+    writeToFile.write("\n Average accuracy: " + str(totalScore/totalRuns))
     return totalScore/totalRuns
 
 def calculateAcurracyRun(expected, dfRes):
-    """"
-        Calculates the accuracy of 1 rune
-        :excepted: expected sequence in the form of a list
-        :dfRes: guessed sequence in a pandas dataframe
+    """
+
+    :param expected: expected sequence
+    :param dfRes: dataframe of guessed sequence
+    :return: accuracy of single run
     """
     right = 0
     total = 0
     index = 0
+    toMatchIndex = 0
+    sameColorCounter = 0
+    lastColor = None
     rowCount = len(dfRes.index)
     if rowCount> len(expected):
         runLength = rowCount
+        while index < runLength:
+            if index < rowCount and toMatchIndex < len(expected):
+                rowData = dfRes.loc[index, :]
+
+
+                if isSameColor(expected[toMatchIndex], rowData[0]):
+                    right += 1
+                elif toMatchIndex + 1 < len(expected) and isSameColor(expected[toMatchIndex + 1], rowData[0]):
+                    right += 1
+                    total += 1
+                    toMatchIndex += 1
+                else:
+                    safeIndex = toMatchIndex
+                    rowData2 = dfRes.loc[index+1, :]
+                    while sameColorCounter>0:
+                        safeIndex +=1
+                        # temp1 = safeIndex
+                        # temp2 = (expected[safeIndex])
+                        # temp3 = rowData[0]
+                        if safeIndex < len(expected) and isSameColor(expected[safeIndex], rowData[0]):
+                            right+=1
+                            total += (safeIndex-toMatchIndex)
+                            toMatchIndex = safeIndex
+                            break
+                        elif safeIndex < len(expected) and index<rowCount and isSameColor(expected[safeIndex], rowData2[0]):
+                            right += 1
+                            total += (safeIndex - toMatchIndex)
+                            index+=1
+                            toMatchIndex = safeIndex
+                            break
+                        sameColorCounter -=1
+                if rowData[0] == lastColor:
+                    sameColorCounter += 1
+                else:
+                    sameColorCounter = 0
+                lastColor = rowData[0]
+
+            total += 1
+            index += 1
+            toMatchIndex += 1
     else:
         runLength = len(expected)
-    while index < runLength:
-        if index<rowCount and index<len(expected):
-            rowData = dfRes.loc[index, :]
-            if isSameColor(expected[index], rowData[0]):
-                right +=1
-        total +=1
-        index += 1
+        while toMatchIndex < runLength:
+            if index < rowCount and toMatchIndex < len(expected):
+                rowData = dfRes.loc[index, :]
+                if isSameColor(expected[toMatchIndex], rowData[0]):
+                    right += 1
+                elif toMatchIndex + 1 < len(expected) and isSameColor(expected[toMatchIndex + 1], rowData[0]):
+                    right += 1
+                    total += 1
+                    toMatchIndex += 1
+                else:
+                    safeIndex = toMatchIndex
+                    if index+1< rowCount:
+                        rowData2 = dfRes.loc[index+1, :]
+                    while sameColorCounter>0:
+                        safeIndex +=1
+                        # temp1 = safeIndex
+                        # temp2 = (expected[safeIndex])
+                        # temp3 = rowData[0]
+                        if safeIndex < len(expected) and isSameColor(expected[safeIndex], rowData[0]):
+                            right+=1
+                            total += (safeIndex-toMatchIndex)
+                            toMatchIndex = safeIndex
+                            break
+                        elif safeIndex < len(expected) and index+1<rowCount and isSameColor(expected[safeIndex], rowData2[0]):
+                            right += 1
+                            total += (safeIndex - toMatchIndex)
+                            index+=1
+                            toMatchIndex = safeIndex
+                            break
+                        sameColorCounter -=1
+                if rowData[0] == lastColor:
+                    sameColorCounter += 1
+                else:
+                    sameColorCounter = 0
+                lastColor = rowData[0]
+
+            total += 1
+            index += 1
+            toMatchIndex += 1
+
     return right/total
 
 def isSameColor(exp, res):
-    """"
-        :return: boolean True if the expected and the guessed color are the same, otherwise false
-        # Color Codes:
-        # 1 	black
-        # 2 	blue
-        # 3 	green
-        # 4 	yellow
-        # 5 	red
-        # 6 	white
-        # 7 	brown
+
     """
+
+    :param exp: expected base
+    :param res: guessed base
+    :return: True if guessed and expected base are the same
+    """
+    res = convertColor(res)
+
+    if exp.capitalize() == res:
+        return True
+    else:
+        return False
+
+def convertColor(res):
+    """
+
+    :param res: color code of guessed base
+    :return: capital letter of base
+    """
+    """
+    
+            # Color Codes:
+            # 1 	black
+            # 2 	blue
+            # 3 	green
+            # 4 	yellow
+            # 5 	red
+            # 6 	white
+            # 7 	brown
+        """
     if res == 2:
         res = "B"
     elif res == 3:
@@ -104,14 +209,12 @@ def isSameColor(exp, res):
     elif res == 6:
         res = "W"
     else:
-        return False
-
-    if exp.capitalize() == res:
-        return True
-    else:
-        return False
+        return "0"
+    return res
 
 
 if __name__ == "__main__":
+    writeToFile = open("../accuracyResults/Result2.txt", "w")
     dir = "../trainingData/"
     getAccuracy(dir, getFiles(dir))
+    writeToFile.close()
