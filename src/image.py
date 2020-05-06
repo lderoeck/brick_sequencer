@@ -45,7 +45,7 @@ def main():
     import sys
     import argparse
 
-    from .file import File
+    from .csvfile import CSVFile
 
     parser = argparse.ArgumentParser(description="Convert a sequence CSV to an image")
     parser.add_argument("file", type=str, help="The file to convert")
@@ -60,7 +60,7 @@ def main():
 
         export(df[column], f"{args.image}_{column}.png", height=args.height)
 
-    File.process(args.file, processing)
+    CSVFile(args.file).process(processing)
 
 
 if __name__ == "__main__":
