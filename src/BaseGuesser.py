@@ -8,6 +8,13 @@ def mean_square_error(confidence: pd.Series) -> float:
     return math.sqrt(((1 - confidence) ** 2).sum())
 
 
+def binomial_pdf(k: int, n: int, p: float):
+    """Binomial probability distribution function"""
+    if k < 0:
+        print(n, k, p)
+    return math.comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
+
+
 class BaseGuesser:
     def __init__(self):
         pass
@@ -80,7 +87,7 @@ class BaseGuesser:
         """
 
         # Determine the section/block count
-        sections = int(math.ceil((data["Time"].max() - data["Time"].min()) / speed))
+        sections = int(math.floor((data["Time"].max() + 1 - data["Time"].min()) // speed) + 1)
 
         # Ignore a warning from Pandas
         import warnings
@@ -99,15 +106,40 @@ class BaseGuesser:
         # Clean up the column names
         data = pd.DataFrame(data[data.columns[0]].values, index=data.index, columns=["Colour"])
 
-        confidences = data["Colour"].groupby("Section").value_counts(True)
-        confidences = pd.DataFrame(confidences.values, columns=["Confidence"], index=confidences.index)
+        # Count the number of measurements in each section
+        section_counts = data["Colour"].groupby("Section").count()
+        data["Section-Size"] = data.index.to_series().map(lambda i: i[0]).map(section_counts)
+        # The last element of each section
+        sections_last = section_counts.cumsum()
+        # The first element of each section
+        sections_start = sections_last - section_counts
+        # Calculate the offset in the section for each item
+        data["Section-Offset"] = data.index.to_series().map(lambda i: i[0]).map(sections_start)
+        # Calculate each items' index in the Section
+        temp = data.reset_index().reset_index().apply(lambda row: row["index"] - row["Section-Offset"], axis=1)
+        temp.index = data.index
+        # Insert it back into the data
+        data["Section-Index"] = temp
 
-        return confidences
+        # Calculate the confidence in each measurement
+        temp = data.apply(lambda row: binomial_pdf(int(row["Section-Index"]), int(row["Section-Size"]), 0.5), axis=1)
+        # Insert the individual confidences back into a column
+        data["Confidence"] = temp
+        # Drop some columns no longer required
+        data = data.drop(["Section-Size", "Section-Offset", "Section-Index"], axis=1)
+
+        # Return the summed confidences by colour
+        return data.groupby(["Section", "Colour"]).sum()
+
+        # confidences = data["Colour"].groupby("Section").value_counts(True)
+        # confidences = pd.DataFrame(confidences.values, columns=["Confidence"], index=confidences.index)
+        #
+        # return confidences
 
 
 if __name__ == "__main__":
-    import BaseCaller
-    from src.TimeCalculator import *
+    from . import BaseCaller
+    from .TimeCalculator import *
 
     pd.set_option("display.max_columns", None)
     pd.set_option("display.max_rows", None)
