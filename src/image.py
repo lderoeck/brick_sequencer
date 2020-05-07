@@ -51,7 +51,16 @@ def export_2(series, filename):
         for i in range(len(series)):
             big_sequ.append(series[i][j])
 
-    image_data = [x for x in map(lambda y: colour_rgb[y], big_sequ)]
+    # ik moet meer kleurtjes hebben die niet overeenkomen met basen voor mijn prentjes
+    import copy
+    rgb_copy = copy.copy(colour_rgb)
+    rgb_copy[-1] = (50, 50, 60)
+    rgb_copy[-2] = (200, 100, 80)
+    rgb_copy[-3] = (40, 20, 170)
+
+    image_data = [x for x in map(lambda y: rgb_copy[y], big_sequ)]
+
+    #image_data = [x for x in map(lambda y: dict(colour_rgb, **{-1: (100, 100, 30)})[y], big_sequ)]
 
     image.putdata(image_data)
 
