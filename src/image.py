@@ -1,3 +1,4 @@
+from typing import *
 import pandas as pd
 from PIL import Image
 
@@ -19,6 +20,24 @@ def export(series: pd.Series, filename: str, height: int = 16) -> bool:
 
     return True
 
+
+def export_multiple(series: List[pd.Series], filename: str, height: int = 16) -> bool:
+    total_width = max(series, key=lambda x: x.size).size
+    image = Image.new("RGB", (total_width, height * len(series)))
+
+    image_data = []
+    for serie in series:
+        for _ in range(height):
+            image_data.extend(serie.tolist())
+            image_data.extend([0] * (total_width - serie.size))
+
+    image_data = [x for x in map(lambda y: colour_rgb[y], image_data)]
+
+    image.putdata(image_data)
+
+    image.save(filename)
+
+    return True
 
 
 def export_2(series, filename):
