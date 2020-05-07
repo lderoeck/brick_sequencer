@@ -1,5 +1,5 @@
 import pandas as pd
-from image import export_2
+from .image import export_2
 
 collist = ["0", "1", "b", "g", "y", "r", "W", "7"]
 
@@ -205,6 +205,12 @@ def try_2(x, base_speed):
         pick = [x[i][pos[i]] for i in range(len(x))]
         print("    pick", [collist[c] for c in pick])
 
+        # pijltjes tekenen
+        for i in range(len(x)):
+            # pijltje tekenen op pos[i] op hoogte "i"
+            for y in range(lower_height):
+                image[pos[i]][y + base_height + i * (base_height + sep_height + lower_height)] = -2
+
         if pick.count(pick[0]) == len(x):
             # elke sequence pakt zelfde base -> ok
             out_sequ.append(collist[pick[0]])
@@ -244,6 +250,12 @@ def try_2(x, base_speed):
                 # we willen in het midden van de base blijven -> we willen dat base_end-pos en pos-base_start ongeveer gelijk zijn
                 print("calibrating pos", pos[i], "to", (base_start + base_end) // 2)
                 pos[i] = (base_start + base_end) // 2
+
+                # groen lijntje
+                for y in range(lower_height):
+                    image[pos[i]][y+base_height+i*(base_height+sep_height+lower_height)] = -3
+
+
                 pos[i] += scans_per_base[i]  # naar volgende base gaan
         else:
             print("disagree: break")
@@ -259,15 +271,15 @@ def try_2(x, base_speed):
 
 
 def main():
-    #fname = "../trainingData/WWWWbbbbbbbbbbWWWW_speed5.csv"
-    fname = "../trainingData/WWWWyggbgrbrbygyrbrrWWWW_speed5.csv"
+    fname = "trainingData/WWWWyyrgrrybbgyrWWWW_speed5.csv"
+    #fname = "trainingData/WWWWyggbgrbrbygyrbrrWWWW_speed5.csv"
     x = csv_to_list(fname) # lijst van lijsten
 
-    speed = 0.5  # seconden per base   TODO niet meer hardcoden
+    speed = 0.4  # seconden per base   TODO niet meer hardcoden
 
 
     #scans_per_base = int(100*speed)   # scans/s * s/base -> scans/base
-    #try_1(x, speed)
+    try_1(x, speed)
     try_2(x, speed)
 
 

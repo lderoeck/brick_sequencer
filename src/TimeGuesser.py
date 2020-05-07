@@ -91,28 +91,33 @@ class TimeGuesser:
 
         return sequence
 
+    def basic_guesser(self, array: list, speed: float):
+        sequence = self.split_sequence(array)
+
         # Filter out most likely wrong input
-        # value = np.vectorize(lambda x: x["length"])
-        # avg_length = np.average(value(sequence))
-        # print(avg_length)
-        # cleaned = []
-        #
-        # for data in sequence:
-        #     amount = int(np.round(data["length"] / avg_length))
-        #     if amount <= 0:
-        #         continue
-        #
-        #     if len(cleaned) == 0 or cleaned[-1]["symbol"] != data["symbol"]:
-        #         cleaned.append({"symbol": data["symbol"], "length": amount})
-        #         continue
-        #
-        #     cleaned[-1]["length"] += amount
+        value = np.vectorize(lambda x: x["length"])
+        avg_length = np.average(value(sequence))
+        print(avg_length)
+        cleaned = []
+
+        for data in sequence:
+            amount = int(np.round(data["length"] / speed))
+            if amount <= 0:
+                continue
+
+            if len(cleaned) == 0 or cleaned[-1]["symbol"] != data["symbol"]:
+                cleaned.append({"symbol": data["symbol"], "length": amount})
+                continue
+
+            cleaned[-1]["length"] += amount
+
+        return cleaned
 
 
 if __name__ == "__main__":
     guesser = TimeGuesser()
 
     column = "Colour_p4_01"
-    file = "../trainingData/WWWWyggbgrbrbygyrbrrWWWW_speed30.csv"
+    file = "../trainingData/WWWWyggbgrbrbygyrbrrWWWW_speed5.csv"
     df = pd.read_csv(file, index_col=False, usecols=["Time", column])
-    print(guesser.split_sequence(df[column].to_numpy()))
+    print(guesser.basic_guesser(df[column].to_numpy(), theoretical_speed(5)))
