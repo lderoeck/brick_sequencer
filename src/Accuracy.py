@@ -1,6 +1,7 @@
 from src.BaseGuesser import *
 import src.BaseCaller
 from src.TimeCalculator import *
+from src.TimeGuesser import *
 
 from os import walk
 
@@ -66,6 +67,7 @@ def getAccuracy(dir, files):
     writeToFile.write("\n Average accuracy: " + str(totalScore/totalRuns))
     return totalScore/totalRuns
 
+
 def calculateAcurracyRun(expected, dfRes):
     """
 
@@ -93,14 +95,19 @@ def calculateAcurracyRun(expected, dfRes):
                     right += 1
                     total += 1
                     toMatchIndex += 1
+
+
                 else:
                     safeIndex = toMatchIndex
-                    rowData2 = dfRes.loc[index+1, :]
+                    rowData2 = dfRes.loc[index + 1, :]
+                    rowData3 = dfRes.loc[index + 2, :]
+                    if toMatchIndex+2<len(expected) and isSameColor(expected[toMatchIndex + 1], rowData2[0]) and isSameColor(expected[toMatchIndex + 2], rowData3[0]):
+                        # total+=1
+                        toMatchIndex+=1
+                        index+=1
+                        continue
                     while sameColorCounter>0:
                         safeIndex +=1
-                        # temp1 = safeIndex
-                        # temp2 = (expected[safeIndex])
-                        # temp3 = rowData[0]
                         if safeIndex < len(expected) and isSameColor(expected[safeIndex], rowData[0]):
                             right+=1
                             total += (safeIndex-toMatchIndex)
@@ -137,11 +144,17 @@ def calculateAcurracyRun(expected, dfRes):
                     safeIndex = toMatchIndex
                     if index+1< rowCount:
                         rowData2 = dfRes.loc[index+1, :]
+                        if index+2<rowCount:
+                            rowData3 = dfRes.loc[index + 2, :]
+                            if toMatchIndex+2<len(expected) and isSameColor(expected[toMatchIndex + 1], rowData2[0]) and isSameColor(
+                                    expected[toMatchIndex + 2], rowData3[0]):
+                                # total += 1
+                                toMatchIndex += 1
+                                index += 1
+                                continue
                     while sameColorCounter>0:
                         safeIndex +=1
-                        # temp1 = safeIndex
-                        # temp2 = (expected[safeIndex])
-                        # temp3 = rowData[0]
+
                         if safeIndex < len(expected) and isSameColor(expected[safeIndex], rowData[0]):
                             right+=1
                             total += (safeIndex-toMatchIndex)
@@ -214,7 +227,7 @@ def convertColor(res):
 
 
 if __name__ == "__main__":
-    writeToFile = open("../accuracyResults/Result3.txt", "w")
+    writeToFile = open("../accuracyResults/Result5.txt", "w")
     dir = "../trainingData/"
     getAccuracy(dir, getFiles(dir))
     writeToFile.close()
