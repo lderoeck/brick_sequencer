@@ -2,6 +2,7 @@ from src.BaseGuesser import *
 import src.BaseCaller
 from src.TimeCalculator import *
 from src.TimeGuesser import *
+import pandas as pd
 
 from os import walk
 
@@ -34,6 +35,13 @@ def getAccuracy(dir, files):
                 sequence = file.split("_")[1].split(".csv")[0]
         else:
             sequence=file.split("speed")[0]
+
+        speed = file.find('speed')
+        dotIndex = file.find('.')
+        if speed == -1:
+            speed = 5
+        else:
+            speed = int(file[speed+5:dotIndex])
         file = dir + file
         cols = pd.read_csv(file, nrows=1).columns.tolist()
         columnNumber = 1
@@ -49,9 +57,11 @@ def getAccuracy(dir, files):
             if df[column].dtypes != float:
                 df[column] = pd.to_numeric(df[column], errors='coerce')
 
-            time = TimeCalculator().calc_time(df[column].to_numpy())
-
-            dfRes = BaseGuesser.sequence(src.BaseCaller.dropNonSequence(df), time)
+            #time = TimeCalculator().calc_time(df[column].to_numpy())
+            guesser = TimeGuesser()
+            guess = guesser.basic_guesser(df[column].to_numpy(), theoretical_speed(speed))
+            dfRes = toDataframe(guess)
+            # dfRes = BaseGuesser.sequence(src.BaseCaller.dropNonSequence(df), time)
             writeToFile.write("Guessed sequence: ")
             for i,j in dfRes.iterrows():
                 writeToFile.write(convertColor(j[0]))
@@ -211,23 +221,39 @@ def convertColor(res):
             # 6 	white
             # 7 	brown
         """
-    if res == 2:
+    if res == 2 or res == 'B':
         res = "B"
-    elif res == 3:
+    elif res == 3 or res == 'G':
         res = "G"
-    elif res == 4:
+    elif res == 4 or res == 'Y':
         res = "Y"
-    elif res == 5:
+    elif res == 5 or res == 'R':
         res = "R"
-    elif res == 6:
+    elif res == 6 or res == 'W':
         res = "W"
     else:
         return "0"
     return res
 
+def toDataframe(guess):
+
+
+    tempList = []
+    for entry in guess:
+        for i in range(entry['length']):
+            if entry['symbol'] == 'Black':
+                tempList.append('1')
+            else:
+                tempList.append(entry['symbol'][0])
+
+    dfRes = pd.DataFrame(tempList, columns=["Colour"])
+
+    return dfRes
+
+
 
 if __name__ == "__main__":
-    writeToFile = open("../accuracyResults/Result5.txt", "w")
+    writeToFile = open("../accuracyResults/Result6.txt", "w")
     dir = "../trainingData/"
     getAccuracy(dir, getFiles(dir))
     writeToFile.close()

@@ -97,7 +97,7 @@ class TimeGuesser:
         # Filter out most likely wrong input
         value = np.vectorize(lambda x: x["length"])
         avg_length = np.average(value(sequence))
-        print(avg_length)
+        #print(avg_length)
         cleaned = []
 
         for data in sequence:
